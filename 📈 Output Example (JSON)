@@ -1,0 +1,9 @@
+{
+  "timestamp": "2026-07-07T14:30:00Z",
+  "site": "hospital_01",
+  "anomaly_score": 0.89,
+  "risk_level": "HIGH",
+  "predicted_attack": "Port_Scanning",
+  "recommended_action": "Block source IP and flush ARP cache",
+  "fed_round": 42
+}
