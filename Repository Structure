@@ -1,0 +1,23 @@
+PrivaNet/
+├── README.md
+├── LICENSE (MIT)
+├── docker-compose.yml
+├── requirements.txt
+├── .env.example
+├── src/
+│   ├── server/
+│   │   ├── aggregator.py      # Federated averaging server
+│   │   └── api.py             # REST API for clients
+│   ├── client/
+│   │   ├── collector.py       # Captures network flows (pcap/NFLog)
+│   │   ├── trainer.py         # Local model training
+│   │   └── detector.py        # Real-time anomaly scoring
+│   ├── models/
+│   │   ├── isolation_forest.py
+│   │   └── neural_net.py
+│   └── utils/
+│       ├── logger.py
+│       └── alert.py           # Slack/Telegram/Email
+├── tests/
+└── examples/
+    └── sample_pcaps/
