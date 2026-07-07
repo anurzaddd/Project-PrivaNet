@@ -1,0 +1,47 @@
+import pyshark
+import json
+import os
+from datetime import datetime
+from sklearn.ensemble import IsolationForest
+import numpy as np
+
+class FlowCollector:
+    def __init__(self, interface="eth0"):
+        self.interface = interface
+        self.capture = None
+        self.features = []
+
+    def start_capture(self, packet_count=100):
+        self.capture = pyshark.LiveCapture(interface=self.interface, packet_count=packet_count)
+        for packet in self.capture.sniff_continuously():
+            try:
+                feature_vector = self.extract_features(packet)
+                self.features.append(feature_vector)
+                if len(self.features) > 1000:
+                    self.features.pop(0)
+            except AttributeError:
+                continue
+
+    def extract_features(self, packet):
+        # Extract basic flow features (simplified for demo)
+        return [
+            len(packet),
+            packet.ip.src if hasattr(packet, 'ip') else '0.0.0.0',
+            packet.ip.dst if hasattr(packet, 'ip') else '0.0.0.0',
+            packet.tcp.srcport if hasattr(packet, 'tcp') else 0,
+            packet.tcp.dstport if hasattr(packet, 'tcp') else 0
+        ]
+
+    def train_local_model(self):
+        if len(self.features) < 50:
+            return None
+        X = np.array([[f[0], f[3], f[4]] for f in self.features])  # length, srcport, dstport
+        model = IsolationForest(contamination=0.05, random_state=42)
+        model.fit(X)
+        return model
+
+    def send_weights(self, model):
+        # In production, send via gRPC/REST
+        import requests
+        weights = model.get_params()  # simplified
+        requests.post("http://localhost:8000/aggregate", json={"site": os.getenv("SITE_ID"), "weights": weights})
